@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Skin AI Search</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    background:#0f172a;
+    color:white;
+    font-family:Arial, sans-serif;
+    margin:0;
+    padding:40px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.upload-box{
+    background:#1e293b;
+    border:3px dashed #334155;
+    border-radius:20px;
+    padding:40px;
+    max-width:800px;
+    margin:0 auto 40px auto;
+    text-align:center;
+    transition:0.3s;
+}
+
+.upload-box:hover{
+    border-color:#60a5fa;
+}
+
+.upload-box h3{
+    margin-top:0;
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:14px 24px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+.preview-local{
+    margin-top:20px;
+}
+
+.preview-local img{
+    max-width:300px;
+    max-height:300px;
+    border-radius:15px;
+    border:3px solid #334155;
+}
+
+.preview{
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.preview img{
+    max-width:500px;
+    border-radius:15px;
+    border:3px solid #334155;
+}
+
+.best-match{
+    background:#1e293b;
+    border-radius:20px;
+    padding:25px;
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.best-match img{
+    width:350px;
+    max-width:100%;
+    border-radius:15px;
+}
+
+.skin-name{
+    font-size:28px;
+    font-weight:bold;
+    margin-top:15px;
+}
+
+.score{
+    color:#60a5fa;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:#1e293b;
+    border-radius:15px;
+    padding:15px;
+    text-align:center;
+    transition:0.2s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card img{
+    width:100%;
+    border-radius:10px;
+}
+
+.similarity{
+    color:#60a5fa;
+    font-weight:bold;
+}
+
+.subtitle{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🔍 Skin AI Search</h1>
+
+<form method="POST" enctype="multipart/form-data">
+
+    <div class="upload-box" id="drop-zone">
+
+        <h3 id="upload-text">
+            Arraste uma imagem aqui
+        </h3>
+
+        <p>
+            ou clique para selecionar
+        </p>
+
+        <input
+            type="file"
+            id="imagem"
+            name="imagem"
+            accept="image/*"
+            hidden
+            required
+        >
+
+        <button
+            type="button"
+            onclick="document.getElementById('imagem').click()"
+        >
+            Selecionar Imagem
+        </button>
+
+        <br><br>
+
+        <div
+            class="preview-local"
+            id="preview-local"
+            style="display:none;"
+        >
+            <img id="preview-image">
+        </div>
+
+        <br>
+
+        <button type="submit">
+            Identificar Skin
+        </button>
+
+    </div>
+
+</form>
+
+{% if imagem_url %}
+
+<div class="preview">
+
+    <h2>Imagem Enviada</h2>
+
+    <img src="{{ imagem_url }}">
+
+</div>
+
+{% endif %}
+
+{% if resultados %}
+
+<div class="best-match">
+
+    <h2>Skin Encontrada</h2>
+
+    <img src="/skins/{{ resultados[0].arquivo }}">
+
+    <div class="skin-name">
+        {{ resultados[0].nome }}
+    </div>
+
+    <div class="score">
+        {{ resultados[0].score }}%
+    </div>
+
+</div>
+
+<h2 class="subtitle">
+    Top 5 Resultados
+</h2>
+
+<div class="grid">
+
+    {% for result in resultados %}
+
+    <div class="card">
+
+        <img
+            src="/skins/{{ result.arquivo }}"
+            alt="{{ result.nome }}"
+        >
+
+        <h3>
+            {{ result.nome }}
+        </h3>
+
+        <p class="similarity">
+            {{ result.score }}%
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+<script>
+
+const dropZone =
+    document.getElementById("drop-zone");
+
+const input =
+    document.getElementById("imagem");
+
+const uploadText =
+    document.getElementById("upload-text");
+
+const previewContainer =
+    document.getElementById("preview-local");
+
+const previewImage =
+    document.getElementById("preview-image");
+
+function mostrarPreview(file){
+
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+
+        previewImage.src =
+            e.target.result;
+
+        previewContainer.style.display =
+            "block";
+    };
+
+    reader.readAsDataURL(file);
+}
+
+dropZone.addEventListener(
+    "dragover",
+    function(e){
+
+        e.preventDefault();
+
+        dropZone.style.borderColor =
+            "#60a5fa";
+    }
+);
+
+dropZone.addEventListener(
+    "dragleave",
+    function(){
+
+        dropZone.style.borderColor =
+            "#334155";
+    }
+);
+
+dropZone.addEventListener(
+    "drop",
+    function(e){
+
+        e.preventDefault();
+
+        dropZone.style.borderColor =
+            "#334155";
+
+        input.files =
+            e.dataTransfer.files;
+
+        if(input.files.length > 0){
+
+            uploadText.innerText =
+                input.files[0].name;
+
+            mostrarPreview(
+                input.files[0]
+            );
+        }
+    }
+);
+
+input.addEventListener(
+    "change",
+    function(){
+
+        if(input.files.length > 0){
+
+            uploadText.innerText =
+                input.files[0].name;
+
+            mostrarPreview(
+                input.files[0]
+            );
+        }
+    }
+);
+
+</script>
+
+</body>
+</html>

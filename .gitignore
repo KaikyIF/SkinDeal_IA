@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+
+# Ambiente virtual
+venv/
+
+# IA
+skins/
+uploads/
+
+embeddings.npy
+skin_clip_finetuned.pt
+
+*.pt
+*.pth
+*.safetensors
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini

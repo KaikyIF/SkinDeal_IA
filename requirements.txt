@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+torch
+torchvision
+pillow
+open_clip_torch
+numpy
+scikit-learn
+jinja2
+python-multipart

@@ -32,3 +32,4 @@ SkinDeal_IA/
 │   └── index.html
 └── requirements.txt
 ```
+DEPOIS DISTO BASTA RODAR O ARQUIVO app.py
